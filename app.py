@@ -1,33 +1,45 @@
-import mysql.connector 
 
-import streamlit as st 
+import mysql.connector
+import streamlit as st
 
-st.title("Conexión con base de datos MySQL") 
+st.title("Conexión con base de datos MySQL")
 
-# Obtener las credenciales almacenadas en Streamlit Secrets 
+# Obtener credenciales de Streamlit Secrets
+host = st.secrets["mysql"]["host"]
+port = st.secrets["mysql"]["port"]
+user = st.secrets["mysql"]["user"]
+password = st.secrets["mysql"]["password"]
+database = st.secrets["mysql"]["database"]
 
-host = st.secrets["mysql"]["host"] 
+try:
+    conn = mysql.connector.connect(
+        host=host,
+        port=int(port),
+        user=user,
+        password=password,
+        database=database,
+        connection_timeout=10
+    )
 
-port = st.secrets["mysql"]["port"] 
+    if conn.is_connected():
+        st.success("¡Conexión exitosa con MySQL!")
 
-user = st.secrets["mysql"]["user"] 
+        cursor = conn.cursor()
+        cursor.execute("SHOW TABLES")
+        tablas = cursor.fetchall()
 
-password = st.secrets["mysql"]["password"] 
+        st.subheader("Tablas de la base de datos")
 
-database = st.secrets["mysql"]["database"] 
+        if tablas:
+            for tabla in tablas:
+                st.write(tabla[0])
+        else:
+            st.info("La base de datos todavía no tiene tablas.")
 
-# Intentar establecer la conexión 
+        cursor.close()
+        conn.close()
 
-try: 
-
-    conn = mysql.connector.connect( 
-
-        host=host, 
-
-        port=port, 
-
-        user=user, 
-
-        password=password, 
-
-        database=database 
+except mysql.connector.Error as error:
+    st.error(f"Error de conexión: {error}")
+except Exception as error:
+    st.error(f"Revisá la configuración: {error}")
