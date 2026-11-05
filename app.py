@@ -2,6 +2,7 @@
 import streamlit as st
 from modulos.login import login
 from modulos.VENTAS import mostrar_venta
+from modulos.PRODUCTOS import mostrar_productos
 
 # Inicializar variables de sesión
 if "sesion_iniciada" not in st.session_state:
@@ -12,6 +13,7 @@ if "usuario" not in st.session_state:
 
 # Comprobar si el usuario inició sesión
 if st.session_state["sesion_iniciada"]:
+
     st.sidebar.title("Menú")
 
     st.sidebar.write(
@@ -20,6 +22,7 @@ if st.session_state["sesion_iniciada"]:
 
     opciones = [
         "Ventas",
+        "Productos",
         "Información"
     ]
 
@@ -28,11 +31,12 @@ if st.session_state["sesion_iniciada"]:
         opciones
     )
 
-    # Mostrar módulo de ventas
     if seleccion == "Ventas":
         mostrar_venta()
 
-    # Mostrar módulo de información
+    elif seleccion == "Productos":
+        mostrar_productos()
+
     elif seleccion == "Información":
         st.header("Información del sistema")
         st.write(
@@ -40,13 +44,11 @@ if st.session_state["sesion_iniciada"]:
             "el Laboratorio de SGI."
         )
 
-    # Cerrar sesión
     if st.sidebar.button("Cerrar sesión"):
         st.session_state["sesion_iniciada"] = False
         st.session_state["usuario"] = ""
         st.rerun()
 
 else:
-    # Si no hay sesión iniciada, mostrar login
     login()
 
